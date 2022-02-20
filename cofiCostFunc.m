@@ -40,8 +40,55 @@ Theta_grad = zeros(size(Theta));
 %                     partial derivatives w.r.t. to each element of Theta
 %
 
+getSum = 0;
+for i=1:num_movies
+    for j=1:num_users
+        if R(i , j) == 1
+            getSum = getSum +  power( (( X(i , :) * Theta(j , :)'  ) - Y(i , j)) , 2);
+        end
+    end
+end
 
 
+% Theta_grad
+for i = 1: num_movies
+    idx = find(R(i,:) == 1);
+    Theta_temp = Theta(idx,:);
+    Y_temp = Y(i,idx);
+    X_grad(i,:) = (X(i,:) * Theta_temp' - Y_temp) * Theta_temp;
+    X_grad(i,:) = X_grad(i,:) + lambda * X(i,:);
+end
+
+for j = 1: num_users
+    idx = find(R(:,j) == 1); % find i
+    X_temp = X(idx,:);
+    Y_temp = Y(idx,j);
+    Theta_grad(j,:) = (X_temp * Theta(j,:)' - Y_temp)' * X_temp;
+    Theta_grad(j,:) = Theta_grad(j,:) + lambda * Theta(j,:);
+end
+
+
+getSum2 = 0;
+
+for i=1:num_users
+    for j=1:num_features
+        getSum2 = getSum2 + power(Theta(i , j) , 2);
+    end
+end
+
+getSum2 = (lambda * getSum2)/2;
+
+getSum3 = 0;
+
+for i=1:num_movies
+    for j=1:num_features
+        getSum3 = getSum3 + power(X(i , j) , 2);
+    end
+end
+
+getSum3 = (lambda * getSum3)/2;
+
+J = getSum / 2 + getSum2 + getSum3;
 
 
 
